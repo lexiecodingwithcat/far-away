@@ -6,11 +6,20 @@ const initialItems = [
 ];
 
 export default function App() {
+  //because Form and Pakcinglist are siblings, so we need to lift up states
+  const [items, setItems]=useState([]);
+
+  function handleAddItems(item){
+    //react is immutable, so we need to create a new array instead of using the current one
+    //so we need to update the state based on current state
+    setItems((items)=>[...items, item]);
+
+  }
   return (
     <div className="app">
       <Logo />
-      <Form />
-      <PackingList />
+      <Form onAddItems={handleAddItems}/>
+      <PackingList items ={items} />
       <Stats />
     </div>
   );
@@ -19,19 +28,30 @@ export default function App() {
 function Logo() {
   return <h1>🏝️ Far Away 💼 </h1>;
 }
-function Form() {
+
+function Form({onAddItems}) {
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState(1);
+
+
   function handleSubmit(e) {
     //prevent webpage from refreshing
     e.preventDefault();
+
     if(!description) return;
+
     const newItem = { description, quantity, packed: false, id: Date.now() };
-    console.log(newItem);
+
+
+    onAddItems(newItem);
+    
+    //set state to original value
+    setDescription("");
+    setQuantity(1);
   }
   return (
     //we tie onchange to the form so that either click button or press enter, the form will be submitted
-    <form className="add-form" onChange={handleSubmit}>
+    <form className="add-form" onSubmit={handleSubmit}>
       <h3>What do you need for your 😍 trip? </h3>
       <select
         value={quantity}
@@ -54,11 +74,11 @@ function Form() {
   );
 }
 
-function PackingList() {
+function PackingList({items}) {
   return (
     <div className="list">
       <ul>
-        {initialItems.map((item) => (
+        {items.map((item) => (
           <Item item={item} key={item.id} />
         ))}
       </ul>
