@@ -31,7 +31,7 @@ export default function App() {
         onDeleteItems={handleDeleteItems}
         onToggleItems={handleToggleItems}
       />
-      <Stats />
+      <Stats items={items} />
     </div>
   );
 }
@@ -84,13 +84,39 @@ function Form({ onAddItems }) {
 }
 
 function PackingList({ items, onDeleteItems, onToggleItems }) {
+  const [sortedBy, setSortedBy] = useState("input");
+  let sortedItems;
+  if (sortedBy === "input") sortedItems = items;
+  //arr.slice() is to copy the original arrays to new one
+  if (sortedBy === "description")
+    sortedItems = items
+      .slice()
+      .sort((a, b) => a.description.localeCompare(b.description));
+  //when compared booleans, we need to change it to numbers first
+  if (sortedBy === "packed")
+    sortedItems = items
+      .slice()
+      .sort((a, b) => Number(a.packed) - Number(b.packed));
+
   return (
     <div className="list">
       <ul>
-        {items.map((item) => (
-          <Item item={item} key={item.id} onDeleteItems={onDeleteItems} onToggleItems={onToggleItems}/>
+        {sortedItems.map((item) => (
+          <Item
+            item={item}
+            key={item.id}
+            onDeleteItems={onDeleteItems}
+            onToggleItems={onToggleItems}
+          />
         ))}
       </ul>
+      <div className="action">
+        <select value={sortedBy} onChange={(e) => setSortedBy(e.target.value)}>
+          <option value="input">Sorted by input</option>
+          <option value="description">Sorted by description</option>
+          <option value="packed">Sorted by packed status</option>
+        </select>
+      </div>
     </div>
   );
 }
@@ -98,7 +124,11 @@ function PackingList({ items, onDeleteItems, onToggleItems }) {
 function Item({ item, onDeleteItems, onToggleItems }) {
   return (
     <li>
-      <input type="checkbox" value={item.packed} onChange={()=>onToggleItems(item.id)} />
+      <input
+        type="checkbox"
+        value={item.packed}
+        onChange={() => onToggleItems(item.id)}
+      />
       <span style={item.packed ? { textDecoration: "line-through" } : {}}>
         {item.quantity} {item.description}
       </span>
@@ -108,10 +138,26 @@ function Item({ item, onDeleteItems, onToggleItems }) {
   );
 }
 
-function Stats() {
+function Stats({ items }) {
+  //if there is no items
+  if (!items.length)
+    return (
+      <p className="stats">
+        <em>Start adding some items to your packing list 🚀</em>
+      </p>
+    );
+  //derived state
+  const numItems = items.length;
+  const packedItems = items.filter((item) => item.packed).length;
+  const percentage = Math.round((packedItems / numItems) * 100) || 0;
   return (
     <footer className="stats">
-      <em>💼 You have X items on your list, and you already packed X (x%)</em>
+      <em>
+        {percentage === 100
+          ? "You got everything packed! ready to go ✈️"
+          : `💼 You have ${numItems} items on your list, and you already packed
+        ${packedItems} ( ${percentage}%)`}
+      </em>
     </footer>
   );
 }
