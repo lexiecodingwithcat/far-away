@@ -4,14 +4,14 @@
 A simple and user-friendly application to help you keep track of your travel packing list. 
 Easily add, delete, and filter items to ensure you never forget anything on your trips!
 
-## Features
+## Features ✨
 
 - **Add Items**: Quickly add new items to your packing list.
 - **Delete Items**: Remove items from your list when they're no longer needed.
 - **Select Quantity**: Specify how many of each item you need to pack.
 - **Filter Items**: Use filters to quickly find specific items in your list.
 
-## Getting Started
+## Getting Started 👇
 
 ### Prerequisites
 
